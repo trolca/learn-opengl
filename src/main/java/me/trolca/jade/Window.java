@@ -1,12 +1,11 @@
 package me.trolca.jade;
 
+import me.trolca.jade.scenes.Scene;
+import me.trolca.jade.scenes.SceneType;
+import me.trolca.jade.utils.Time;
 import org.lwjgl.Version;
 import org.lwjgl.glfw.*;
 import org.lwjgl.opengl.GL;
-import org.lwjgl.system.Callback;
-import org.lwjgl.system.MemoryUtil;
-
-import java.nio.ByteBuffer;
 
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
@@ -16,8 +15,9 @@ public class Window {
 
     private int width, height;
     private String title;
-
     private long glfwWindow;
+
+    public float r, g, b, a;
 
     private GLFWCursorPosCallback mouseMoveCallback = null;
     private GLFWMouseButtonCallback mouseButtonCallback = null;
@@ -26,10 +26,16 @@ public class Window {
 
     private static Window window = null;
 
+    private static Scene currentScene = null;
+
     private Window(){
         this.width = 1920;
         this.height = 1080;
         this.title = "Sussy baka";
+    }
+
+    public static void changeScene(SceneType sceneType){
+        currentScene = sceneType.getInstance();
     }
 
     public static Window get(){
@@ -98,33 +104,35 @@ public class Window {
         GLFW.glfwShowWindow(glfwWindow);
 
         GL.createCapabilities();
+        Window.changeScene(SceneType.LEVEL_EDITOR);
     }
 
     private void loop(){
-        float red, green, blue;
-        boolean debounce = false;
-        red = 0f;
-        green = 0f;
-        blue = 0f;
+        float beginTime = Time.getTime();
+        float endTime;
+        float dt = -1.0f;
+        r = 1.0f;
+        g = 1.0f;
+        b = 1.0f;
+        a = 1.0f;
 
         while (!GLFW.glfwWindowShouldClose(glfwWindow)){
             //Poll events (inputs)
             GLFW.glfwPollEvents();
 
-            glClearColor(red, green, blue, 1.0f);
+            glClearColor(r, g, b, a);
             glClear(GL_COLOR_BUFFER_BIT);
 
+            if(dt >= 0) {
+                currentScene.update(dt);
+            }
             glfwSwapBuffers(glfwWindow);
 
-            if(MouseListener.isAnyKeyPressed() && !debounce){
-                red = (float) Math.random();
-                green = (float) Math.random();
-                blue = (float) Math.random();
-                debounce = true;
-            }else if(!MouseListener.isAnyKeyPressed() && debounce){
-                debounce = false;
-            }
+            endTime = Time.getTime();
+            dt = endTime - beginTime;
+            beginTime = endTime;
 
+            System.out.println((1.0f / dt) + "FPS");
         }
     }
 
