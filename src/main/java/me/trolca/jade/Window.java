@@ -19,11 +19,6 @@ public class Window {
 
     public float r, g, b, a;
 
-    private GLFWCursorPosCallback mouseMoveCallback = null;
-    private GLFWMouseButtonCallback mouseButtonCallback = null;
-    private GLFWScrollCallback mouseScrollCallback = null;
-    private GLFWKeyCallback keyCallback = null;
-
     private static Window window = null;
 
     private static Scene currentScene = null;
@@ -60,12 +55,9 @@ public class Window {
         GLFW.glfwTerminate();
         GLFW.glfwSetErrorCallback(null).free();
 
-        mouseMoveCallback.close();
-        mouseButtonCallback.close();
-        mouseScrollCallback.close();
-        keyCallback.close();
     }
 
+    @SuppressWarnings("resource")
     private void init(){
         //Error callback
         GLFWErrorCallback.createPrint(System.err).set();
@@ -89,10 +81,11 @@ public class Window {
             throw new IllegalStateException("Couldn't create the window!");
         }
 
-        mouseMoveCallback = glfwSetCursorPosCallback(glfwWindow, MouseListener::mousePosCallback);
-        mouseButtonCallback = glfwSetMouseButtonCallback(glfwWindow, MouseListener::mouseButtonCallback);
-        mouseScrollCallback = glfwSetScrollCallback(glfwWindow, MouseListener::mouseScrollCallback);
-        keyCallback = glfwSetKeyCallback(glfwWindow, KeyListener::keyCallback);
+        glfwSetCursorPosCallback(glfwWindow, MouseListener::mousePosCallback);
+        glfwSetMouseButtonCallback(glfwWindow, MouseListener::mouseButtonCallback);
+        glfwSetScrollCallback(glfwWindow, MouseListener::mouseScrollCallback);
+        glfwSetKeyCallback(glfwWindow, KeyListener::keyCallback);
+
         //Make the OpenGL context current
 
         GLFW.glfwMakeContextCurrent(glfwWindow);
@@ -128,11 +121,12 @@ public class Window {
             }
             glfwSwapBuffers(glfwWindow);
 
+
             endTime = Time.getTime();
             dt = endTime - beginTime;
             beginTime = endTime;
 
-            System.out.println((1.0f / dt) + "FPS");
+            //System.out.println((1.0f / dt) + "FPS");
         }
     }
 
