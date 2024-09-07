@@ -2,10 +2,12 @@ package me.trolca.jade.scenes;
 
 import me.trolca.jade.KeyListener;
 import me.trolca.jade.Window;
+import me.trolca.jade.utils.ShaderUtils;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.system.ThreadLocalUtil;
 
 import java.awt.event.KeyEvent;
+import java.io.IOException;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 
@@ -15,31 +17,7 @@ import static org.lwjgl.opengl.GL30.glGenVertexArrays;
 
 public class LevelEditorScene extends Scene {
 
-    private String vertexShaderSrc =
-            """
-                    #version 330 core
-                    layout (location=0) in vec3 aPos;
-                    layout (location=1) in vec4 aColor;
-                    
-                    out vec4 fColor;
-                    
-                    void main()
-                    {
-                        fColor = aColor;
-                    
-                        gl_Position = vec4(aPos, 1.0);
-                    }""";
-
-    private String fragmentShaderSrc = """
-            #version 330 core
-            in vec4 fColor;
-            
-            out vec4 color;
-            
-            void main()
-            {
-                color = fColor;
-            }""";
+    private String[] shaders;
 
     private int vertexID, fragmentID, shaderProgram;
 
@@ -60,6 +38,11 @@ public class LevelEditorScene extends Scene {
     private int vaoID, vboID, eboID;
 
     public LevelEditorScene(){
+        try {
+            this.shaders = ShaderUtils.getShaders("default.glsl");
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
         System.out.println("Inside level editor scene");
         init();
     }
@@ -71,7 +54,7 @@ public class LevelEditorScene extends Scene {
         //Load and compile the vertex shader
         vertexID = glCreateShader(GL_VERTEX_SHADER);
         //Pass the shader code to the GPU
-        glShaderSource(vertexID, vertexShaderSrc);
+        glShaderSource(vertexID, this.shaders[0]);
         glCompileShader(vertexID);
 
         //Check if error in compilation
@@ -87,7 +70,7 @@ public class LevelEditorScene extends Scene {
         //Load and compile the fragment shader
         fragmentID = glCreateShader(GL_FRAGMENT_SHADER);
         //Pass the shader code to the GPU
-        glShaderSource(fragmentID, fragmentShaderSrc);
+        glShaderSource(fragmentID, shaders[1]);
         glCompileShader(fragmentID);
 
         //Check if error in compilation
@@ -156,7 +139,7 @@ public class LevelEditorScene extends Scene {
     public void update(float dt) {
         //Bind shader program
         glUseProgram(shaderProgram);
-        //Bind the VAO that we-re using
+        //Bind the VAO that we're using
         glBindVertexArray(vaoID);
 
         //Enable vertex attribute pointers

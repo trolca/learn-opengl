@@ -97,7 +97,7 @@ public class Window {
         GLFW.glfwShowWindow(glfwWindow);
 
         GL.createCapabilities();
-        Window.changeScene(SceneType.LEVEL_EDITOR);
+        Window.changeScene(SceneType.LEVEL_PLAY);
     }
 
     private void loop(){
