@@ -1,13 +1,10 @@
 package me.trolca.jade.scenes;
 
-import me.trolca.jade.KeyListener;
-import me.trolca.jade.Window;
-import me.trolca.jade.utils.ShaderUtils;
+import me.trolca.jade.Camera;
+import me.trolca.renderer.Shader;
+import org.joml.Vector2f;
 import org.lwjgl.BufferUtils;
-import org.lwjgl.system.ThreadLocalUtil;
 
-import java.awt.event.KeyEvent;
-import java.io.IOException;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 
@@ -17,16 +14,14 @@ import static org.lwjgl.opengl.GL30.glGenVertexArrays;
 
 public class LevelEditorScene extends Scene {
 
-    private String[] shaders;
-
     private int vertexID, fragmentID, shaderProgram;
 
     private float[] vertexArray = {
       //position                   //color
-       0.5f, -0.5f, 0.0f,           1.0f, 0.0f, 0.0f, 1.0f, //Bottom right
-      -0.5f, 0.5f, 0.0f,            0.0f, 1.0f, 0.0f, 1.0f, //Top left
-       0.5f, 0.5f, 0.0f,            0.0f, 0.0f, 1.0f, 1.0f, //Top right
-      -0.5f, -0.5f, 0.0f,           1.0f, 1.0f, 0.0f, 1.0f  //Bottom left
+       500.5f, -500.5f, 0.0f,           1.0f, 0.0f, 0.0f, 1.0f, //Bottom right
+      -500.5f, 500.5f, 0.0f,            0.0f, 1.0f, 0.0f, 1.0f, //Top left
+       500.5f, 500.5f, 0.0f,            0.0f, 0.0f, 1.0f, 1.0f, //Top right
+      -500.5f, -500.5f, 0.0f,           1.0f, 1.0f, 0.0f, 1.0f  //Bottom left
     };
 
     //IMPORTANT: Must be in counter-clockwise order
@@ -35,66 +30,20 @@ public class LevelEditorScene extends Scene {
         0, 1, 3
     };
 
+    private Shader shader;
+
     private int vaoID, vboID, eboID;
 
     public LevelEditorScene(){
-        try {
-            this.shaders = ShaderUtils.getShaders("default.glsl");
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        this.shader = new Shader("assets\\shaders\\default.glsl");
         System.out.println("Inside level editor scene");
         init();
     }
 
     @Override
     protected void init() {
-        //Compile and link shaders
 
-        //Load and compile the vertex shader
-        vertexID = glCreateShader(GL_VERTEX_SHADER);
-        //Pass the shader code to the GPU
-        glShaderSource(vertexID, this.shaders[0]);
-        glCompileShader(vertexID);
-
-        //Check if error in compilation
-        int success = glGetShaderi(vertexID, GL_COMPILE_STATUS);
-        if(success == GL_FALSE){
-            int len = glGetShaderi(vertexID, GL_INFO_LOG_LENGTH);
-            System.out.println(len);
-            System.out.println("ERROR: 'defaultShader.glsl'\n\tVertex shader compilation failed");
-            System.out.println(glGetShaderInfoLog(vertexID, len));
-            assert false : "";
-        }
-
-        //Load and compile the fragment shader
-        fragmentID = glCreateShader(GL_FRAGMENT_SHADER);
-        //Pass the shader code to the GPU
-        glShaderSource(fragmentID, shaders[1]);
-        glCompileShader(fragmentID);
-
-        //Check if error in compilation
-        success = glGetShaderi(fragmentID, GL_COMPILE_STATUS);
-        if(success == GL_FALSE){
-            int len = glGetShaderi(fragmentID, GL_INFO_LOG_LENGTH);
-            System.out.println("ERROR: 'defaultShader.glsl'\n\tFragment shader compilation failed");
-            System.out.println(glGetShaderInfoLog(fragmentID, len));
-            assert false : "";
-        }
-
-        //Link shaders and check for errors
-        shaderProgram = glCreateProgram();
-        glAttachShader(shaderProgram, vertexID);
-        glAttachShader(shaderProgram, fragmentID);
-        glLinkProgram(shaderProgram);
-
-        success = glGetProgrami(shaderProgram, GL_LINK_STATUS);
-        if(success == GL_FALSE){
-            int len = glGetProgrami(shaderProgram, GL_INFO_LOG_LENGTH);
-            System.out.println("ERROR: linking \n\tLinking shaders failed");
-            System.out.println(glGetProgramInfoLog(shaderProgram, len));
-            assert false : "";
-        }
+        this.camera = new Camera(new Vector2f());
 
         // VAO, VBO, EBO, buffer objects and send them to the GPU
         // VAO - Vertex Array Object, this is where all the geometry is stored
@@ -137,8 +86,9 @@ public class LevelEditorScene extends Scene {
 
     @Override
     public void update(float dt) {
-        //Bind shader program
-        glUseProgram(shaderProgram);
+        shader.set();
+        shader.uploadMat4f("uProjection", camera.getProjectionMatrix());
+        shader.uploadMat4f("uView", camera.getViewMatrix());
         //Bind the VAO that we're using
         glBindVertexArray(vaoID);
 
@@ -154,7 +104,7 @@ public class LevelEditorScene extends Scene {
 
         glBindVertexArray(0);
 
-        glUseProgram(0);
+        shader.detach();
     }
 
 }

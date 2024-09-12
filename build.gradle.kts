@@ -17,7 +17,7 @@ dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter")
 
     implementation(platform("org.lwjgl:lwjgl-bom:$lwjglVersion"))
-
+    implementation("org.joml:joml:1.10.8")
     implementation("org.lwjgl", "lwjgl")
     implementation("org.lwjgl", "lwjgl-assimp")
     implementation("org.lwjgl", "lwjgl-bgfx")

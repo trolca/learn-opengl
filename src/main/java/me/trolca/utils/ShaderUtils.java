@@ -1,10 +1,8 @@
-package me.trolca.jade.utils;
+package me.trolca.utils;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.Arrays;
 
 public class ShaderUtils {
 

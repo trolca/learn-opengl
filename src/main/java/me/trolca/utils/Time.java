@@ -1,4 +1,4 @@
-package me.trolca.jade.utils;
+package me.trolca.utils;
 
 public class Time {
 

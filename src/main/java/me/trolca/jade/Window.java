@@ -2,7 +2,7 @@ package me.trolca.jade;
 
 import me.trolca.jade.scenes.Scene;
 import me.trolca.jade.scenes.SceneType;
-import me.trolca.jade.utils.Time;
+import me.trolca.utils.Time;
 import org.lwjgl.Version;
 import org.lwjgl.glfw.*;
 import org.lwjgl.opengl.GL;
@@ -97,7 +97,7 @@ public class Window {
         GLFW.glfwShowWindow(glfwWindow);
 
         GL.createCapabilities();
-        Window.changeScene(SceneType.LEVEL_PLAY);
+        Window.changeScene(SceneType.LEVEL_EDITOR);
     }
 
     private void loop(){
@@ -115,6 +115,8 @@ public class Window {
 
             glClearColor(r, g, b, a);
             glClear(GL_COLOR_BUFFER_BIT);
+
+
 
             if(dt >= 0) {
                 currentScene.update(dt);
