@@ -1,10 +1,13 @@
 package me.trolca.jade.scenes;
 
 import me.trolca.jade.Camera;
+import me.trolca.jade.KeyListener;
 import me.trolca.renderer.Shader;
+import me.trolca.utils.Time;
 import org.joml.Vector2f;
 import org.lwjgl.BufferUtils;
 
+import java.awt.event.KeyEvent;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 
@@ -14,14 +17,12 @@ import static org.lwjgl.opengl.GL30.glGenVertexArrays;
 
 public class LevelEditorScene extends Scene {
 
-    private int vertexID, fragmentID, shaderProgram;
-
     private float[] vertexArray = {
       //position                   //color
-       500.5f, -500.5f, 0.0f,           1.0f, 0.0f, 0.0f, 1.0f, //Bottom right
-      -500.5f, 500.5f, 0.0f,            0.0f, 1.0f, 0.0f, 1.0f, //Top left
-       500.5f, 500.5f, 0.0f,            0.0f, 0.0f, 1.0f, 1.0f, //Top right
-      -500.5f, -500.5f, 0.0f,           1.0f, 1.0f, 0.0f, 1.0f  //Bottom left
+       100.5f, 0.5f, 0.0f,           1.0f, 0.0f, 0.0f, 1.0f, //Bottom right
+      -0.5f, 100.5f, 0.0f,            0.0f, 1.0f, 0.0f, 1.0f, //Top left
+       100.5f, 100.5f, 0.0f,            0.0f, 0.0f, 1.0f, 1.0f, //Top right
+      -0.5f, 0.5f, 0.0f,           1.0f, 1.0f, 0.0f, 1.0f  //Bottom left
     };
 
     //IMPORTANT: Must be in counter-clockwise order
@@ -43,7 +44,7 @@ public class LevelEditorScene extends Scene {
     @Override
     protected void init() {
 
-        this.camera = new Camera(new Vector2f());
+        this.camera = new Camera(new Vector2f(0.0f,0.0f));
 
         // VAO, VBO, EBO, buffer objects and send them to the GPU
         // VAO - Vertex Array Object, this is where all the geometry is stored
@@ -86,9 +87,22 @@ public class LevelEditorScene extends Scene {
 
     @Override
     public void update(float dt) {
-        shader.set();
+
+        if(KeyListener.isKeyPressed(KeyEvent.VK_W)){
+            camera.position.add(0,  dt*500.0f);
+        }else if(KeyListener.isKeyPressed(KeyEvent.VK_S)){
+            camera.position.sub(0, dt*500.0f);
+        }else if(KeyListener.isKeyPressed(KeyEvent.VK_A)){
+            camera.position.sub(dt*500, 0);
+        }else if(KeyListener.isKeyPressed(KeyEvent.VK_D)){
+            camera.position.add(dt*500, 0);
+        }
+
+        shader.use();
         shader.uploadMat4f("uProjection", camera.getProjectionMatrix());
         shader.uploadMat4f("uView", camera.getViewMatrix());
+        shader.uploadFloat("uTime", Time.getTime());
+
         //Bind the VAO that we're using
         glBindVertexArray(vaoID);
 

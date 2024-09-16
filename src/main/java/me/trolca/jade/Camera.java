@@ -8,7 +8,7 @@ import org.joml.Vector3f;
 public class Camera {
     //Projection matrix basically defines the game space size :>
     private Matrix4f projectionMatrix, viewMatrix; //View matrix = look at matrix
-    private Vector2f position;
+    public Vector2f position;
 
     public Camera(Vector2f position){
         this.position = position;
