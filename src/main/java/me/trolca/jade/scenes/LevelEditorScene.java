@@ -3,6 +3,7 @@ package me.trolca.jade.scenes;
 import me.trolca.jade.Camera;
 import me.trolca.jade.KeyListener;
 import me.trolca.renderer.Shader;
+import me.trolca.renderer.Texture;
 import me.trolca.utils.Time;
 import org.joml.Vector2f;
 import org.lwjgl.BufferUtils;
@@ -18,11 +19,11 @@ import static org.lwjgl.opengl.GL30.glGenVertexArrays;
 public class LevelEditorScene extends Scene {
 
     private float[] vertexArray = {
-      //position                   //color
-       100.5f, 0.5f, 0.0f,           1.0f, 0.0f, 0.0f, 1.0f, //Bottom right
-      -0.5f, 100.5f, 0.0f,            0.0f, 1.0f, 0.0f, 1.0f, //Top left
-       100.5f, 100.5f, 0.0f,            0.0f, 0.0f, 1.0f, 1.0f, //Top right
-      -0.5f, 0.5f, 0.0f,           1.0f, 1.0f, 0.0f, 1.0f  //Bottom left
+      //position                   //color                      // UV Coordinates
+       100f, 0f, 0.0f,           1.0f, 0.0f, 0.0f, 1.0f,     1, 1, //Bottom right 0
+      -0f, 100f, 0.0f,           0.0f, 1.0f, 0.0f, 1.0f,     0, 0, //Top left 1
+       100f, 100f, 0.0f,         0.0f, 0.0f, 1.0f, 1.0f,     1, 0, //Top right 2
+      -0f, 0f, 0.0f,             1.0f, 1.0f, 0.0f, 1.0f,     0, 1 //Bottom left 3
     };
 
     //IMPORTANT: Must be in counter-clockwise order
@@ -32,6 +33,7 @@ public class LevelEditorScene extends Scene {
     };
 
     private Shader shader;
+    private Texture testTexture;
 
     private int vaoID, vboID, eboID;
 
@@ -50,6 +52,8 @@ public class LevelEditorScene extends Scene {
         // VAO - Vertex Array Object, this is where all the geometry is stored
         // VBO - Vertex Buffer Object, this is where all the vertices are stored and their attributes
         // EBO - Element Buffer Object, this is the order in which the GPU renders the vertices
+
+        this.testTexture = new Texture("assets/textures/testImage.png");
 
         //NEVER USE GLES FOR THIS!!!!!!!!!!!!!!!
         vaoID = glGenVertexArrays();
@@ -76,13 +80,16 @@ public class LevelEditorScene extends Scene {
         //Add the vertex attribute pointers
         int positionsSize = 3;
         int colorSize = 4;
-        int floatSizeBytes = Float.BYTES;
-        int vertexSizeBytes = (positionsSize + colorSize) * floatSizeBytes;
+        int uvSize = 2;
+        int vertexSizeBytes = (positionsSize + colorSize + uvSize) * Float.BYTES;
         glVertexAttribPointer(0, positionsSize, GL_FLOAT, false, vertexSizeBytes, 0);
         glEnableVertexAttribArray(0);
 
-        glVertexAttribPointer(1, colorSize, GL_FLOAT, false, vertexSizeBytes, positionsSize * floatSizeBytes);
+        glVertexAttribPointer(1, colorSize, GL_FLOAT, false, vertexSizeBytes, positionsSize * Float.BYTES);
         glEnableVertexAttribArray(1);
+
+        glVertexAttribPointer(2, uvSize, GL_FLOAT, false, vertexSizeBytes, (positionsSize + colorSize) * Float.BYTES);
+        glEnableVertexAttribArray(2);
     }
 
     @Override
@@ -99,6 +106,12 @@ public class LevelEditorScene extends Scene {
         }
 
         shader.use();
+
+        //Upload texture to shader
+        shader.uploadTexture("TEX_SAMPLER", 0);
+        glActiveTexture(GL_TEXTURE0);
+        testTexture.bind();
+
         shader.uploadMat4f("uProjection", camera.getProjectionMatrix());
         shader.uploadMat4f("uView", camera.getViewMatrix());
         shader.uploadFloat("uTime", Time.getTime());
