@@ -31,6 +31,8 @@ public class Window {
 
     public static void changeScene(SceneType sceneType){
         currentScene = sceneType.getInstance();
+        currentScene.init();
+        currentScene.start();
     }
 
     public static Window get(){

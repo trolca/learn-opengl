@@ -16,11 +16,10 @@ public class LevelScene extends Scene{
         }
 
         System.out.println("Inside level scene");
-        init();
     }
 
     @Override
-    protected void init() {
+    public void init() {
 
     }
 

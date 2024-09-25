@@ -1,7 +1,9 @@
 package me.trolca.jade.scenes;
 
 import me.trolca.jade.Camera;
+import me.trolca.jade.GameObject;
 import me.trolca.jade.KeyListener;
+import me.trolca.jade.components.SpriteRenderer;
 import me.trolca.renderer.Shader;
 import me.trolca.renderer.Texture;
 import me.trolca.utils.Time;
@@ -34,17 +36,22 @@ public class LevelEditorScene extends Scene {
 
     private Shader shader;
     private Texture testTexture;
+    private boolean isFirst = false;
+
+    private GameObject testObj;
 
     private int vaoID, vboID, eboID;
 
     public LevelEditorScene(){
         this.shader = new Shader("assets\\shaders\\default.glsl");
         System.out.println("Inside level editor scene");
-        init();
     }
 
     @Override
-    protected void init() {
+    public void init() {
+        this.testObj = new GameObject("test object")
+                .addComponent(new SpriteRenderer());
+        this.addGameObjectToScene(testObj);
 
         this.camera = new Camera(new Vector2f(0.0f,0.0f));
 
@@ -132,6 +139,18 @@ public class LevelEditorScene extends Scene {
         glBindVertexArray(0);
 
         shader.detach();
+
+        if(!isFirst) {
+            System.out.println("Adding new");
+            GameObject go = new GameObject("Testes")
+                    .addComponent(new SpriteRenderer());
+            this.addGameObjectToScene(go);
+            isFirst = true;
+        }
+
+        for(GameObject gameObject : gameObjects){
+            gameObject.update(dt);
+        }
     }
 
 }
