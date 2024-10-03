@@ -16,6 +16,13 @@ public class Utils {
         return stringBuilder.toString();
     }
 
+    public static  <T> void addValuesToArray(T[] array, T[] itemsToAdd, int from){
+        if((array.length-from) < itemsToAdd.length)
+            throw new IllegalArgumentException("The items to add array is longer than the space available in the core array!");
+
+        System.arraycopy(itemsToAdd, 0, array, from, itemsToAdd.length);
+    }
+
     public static String getTextFromInputStream(InputStream in) throws IOException {
 
         StringBuilder stringBuilder = new StringBuilder();
