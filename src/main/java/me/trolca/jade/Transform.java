@@ -12,6 +12,10 @@ public class Transform  {
         this(new Vector2f(), new Vector2f());
     }
 
+    public Transform(float positionX, float positionY, float scaleX, float scaleY){
+        this(new Vector2f(positionX, positionY), new Vector2f(scaleX, scaleY));
+    }
+
     public Transform(Vector2f position, Vector2f scale){
         this.position = position;
         this.scale = scale;

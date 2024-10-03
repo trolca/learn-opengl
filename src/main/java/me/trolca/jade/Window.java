@@ -2,6 +2,7 @@ package me.trolca.jade;
 
 import me.trolca.jade.scenes.Scene;
 import me.trolca.jade.scenes.SceneType;
+import me.trolca.renderer.Renderer;
 import me.trolca.utils.Time;
 import org.lwjgl.Version;
 import org.lwjgl.glfw.*;
@@ -20,7 +21,6 @@ public class Window {
     public float r, g, b, a;
 
     private static Window window = null;
-
     private static Scene currentScene = null;
 
     private Window(){
@@ -33,6 +33,10 @@ public class Window {
         currentScene = sceneType.getInstance();
         currentScene.init();
         currentScene.start();
+    }
+
+    public static Scene getCurrentScene(){
+        return currentScene;
     }
 
     public static Window get(){
@@ -99,7 +103,7 @@ public class Window {
         GLFW.glfwShowWindow(glfwWindow);
 
         GL.createCapabilities();
-        Window.changeScene(SceneType.LEVEL_EDITOR);
+        Window.changeScene(SceneType.LEVEL_PLAY);
     }
 
     private void loop(){

@@ -1,70 +1,121 @@
 package me.trolca.renderer;
 
+import me.trolca.jade.Window;
 import me.trolca.jade.components.SpriteRenderer;
-import me.trolca.utils.Utils;
 import org.lwjgl.BufferUtils;
 
 import java.nio.FloatBuffer;
+import java.nio.IntBuffer;
+import java.util.Arrays;
 
+import static me.trolca.jade.components.SpriteRenderer.*;
 import static org.lwjgl.opengl.GL11.GL_FLOAT;
-import static org.lwjgl.opengl.GL20.glEnableVertexAttribArray;
-import static org.lwjgl.opengl.GL20.glVertexAttribPointer;
+import static org.lwjgl.opengl.GL15.*;
+import static org.lwjgl.opengl.GL20.*;
 import static org.lwjgl.opengl.GL30.glBindVertexArray;
 import static org.lwjgl.opengl.GL30.glGenVertexArrays;
 
 public class RenderBatch {
 
-    private final int MAX_BATCH_SIZE = 5;
-    private final float[] vertexBuffer = new float[SpriteRenderer.PROPERTIES_SIZE * 4 * MAX_BATCH_SIZE];
-    private final int[] elementBuffer = new int[MAX_BATCH_SIZE * 3];
-    private final SpriteRenderer[] spriteRenderers = new SpriteRenderer[MAX_BATCH_SIZE];
+    private final int VERTICES_SQUARE_SIZE;
+    private final int MAX_BATCH_SIZE;
+    private final float[] verticesArray;
+    private final int[] elementArray;
+    private final SpriteRenderer[] spriteRenderers;
     private int nextFree;
     private boolean isFree;
 
+    private Shader shader;
     private int vaoID, vboID, eboID;
 
-    public RenderBatch(){
+    public RenderBatch(int maxBatchSize){
+        this.shader = new Shader("assets/shaders/default.glsl");
+        this.MAX_BATCH_SIZE = maxBatchSize;
+
+        this.VERTICES_SQUARE_SIZE = SpriteRenderer.PROPERTIES_SIZE * 4;
+        this.verticesArray = new float[this.VERTICES_SQUARE_SIZE * MAX_BATCH_SIZE];
+        this.elementArray = new int[MAX_BATCH_SIZE * 6];
+        this.spriteRenderers = new SpriteRenderer[MAX_BATCH_SIZE];
+
         this.nextFree = 0;
         this.isFree = true;
+        generateElements();
+        init();
     }
 
     public void init(){
         vaoID = glGenVertexArrays();
         glBindVertexArray(vaoID);
 
-        int posSize = 2;
-        int colorSize = 4;
-        int uvSize = 2;
+        vboID = glGenBuffers();
+        glBindBuffer(GL_ARRAY_BUFFER, vboID);
+        glBufferData(GL_ARRAY_BUFFER, (long) verticesArray.length * Float.BYTES, GL_DYNAMIC_DRAW);
 
-        glVertexAttribPointer(0, posSize,  GL_FLOAT, false, SpriteRenderer.PROPERTIES_SIZE, 0);
+
+        eboID = glGenBuffers();
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, eboID);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, elementArray, GL_STATIC_DRAW);
+
+        glVertexAttribPointer(0, POS_SIZE, GL_FLOAT, false, SpriteRenderer.PROPERTIES_SIZE_BYTES, 0);
         glEnableVertexAttribArray(0);
 
-        glVertexAttribPointer(1, colorSize,  GL_FLOAT, false, SpriteRenderer.PROPERTIES_SIZE, posSize * Float.BYTES);
+        glVertexAttribPointer(1, COLOR_SIZE, GL_FLOAT, false, SpriteRenderer.PROPERTIES_SIZE_BYTES, POS_SIZE * Float.BYTES);
         glEnableVertexAttribArray(1);
 
-        glVertexAttribPointer(2, uvSize,  GL_FLOAT, false, SpriteRenderer.PROPERTIES_SIZE, (posSize + colorSize) * Float.BYTES);
+        glVertexAttribPointer(2, UV_SIZE, GL_FLOAT, false, SpriteRenderer.PROPERTIES_SIZE_BYTES, (POS_SIZE + COLOR_SIZE) * Float.BYTES);
         glEnableVertexAttribArray(2);
     }
 
     public void render(){
+        glBindBuffer(GL_ARRAY_BUFFER, vboID);
+        glBufferSubData(GL_ARRAY_BUFFER, 0, verticesArray);
 
+        shader.use();
+
+        shader.uploadMat4f("uProjection", Window.getCurrentScene().getCamera().getProjectionMatrix());
+        shader.uploadMat4f("uView", Window.getCurrentScene().getCamera().getViewMatrix());
+
+        glBindVertexArray(vaoID);
+        glEnableVertexAttribArray(0);
+        glEnableVertexAttribArray(1);
+        glEnableVertexAttribArray(2);
+
+        glDrawElements(GL_TRIANGLES, nextFree * 6, GL_UNSIGNED_INT, 0);
+
+        glDisableVertexAttribArray(0);
+        glDisableVertexAttribArray(1);
+        glDisableVertexAttribArray(2);
+
+        glBindVertexArray(0);
+
+        shader.detach();
     }
 
     public void addSpriteRenderer(SpriteRenderer spriteRenderer){
         if(!isFree) return;
         spriteRenderers[nextFree] = spriteRenderer;
         float[] verticesToAdd = spriteRenderer.getVertices();
-        System.arraycopy(verticesToAdd, 0, vertexBuffer, nextFree * SpriteRenderer.PROPERTIES_SIZE, verticesToAdd.length);
+        System.arraycopy(verticesToAdd, 0, verticesArray, nextFree * VERTICES_SQUARE_SIZE, verticesToAdd.length);
+
+        if(nextFree > 9950) System.out.println(Arrays.toString(verticesArray));
 
         nextFree++;
         if(nextFree >= MAX_BATCH_SIZE) isFree = false;
     }
 
-    private void addElements(int thisFree){
-        //TODO: better this :>
-        int nextIndex = thisFree * 4;
-        elementBuffer[thisFree] = nextIndex + 1;
+    private void generateElements(){
+        for(int i=0; i < elementArray.length; i++){
+            int dividedValue = i / 6;
+            int addVertexIndex = dividedValue * 4;
 
+            elementArray[i] = SpriteRenderer.ELEMENT_TEMPLATE[i % 6] + addVertexIndex;
+        }
+
+    }
+
+
+    public boolean isFree(){
+        return isFree;
     }
 
 }
