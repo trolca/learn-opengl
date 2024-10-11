@@ -1,6 +1,7 @@
 package me.trolca.renderer;
 
 import me.trolca.jade.Window;
+import me.trolca.jade.assetspools.ShaderPool;
 import me.trolca.jade.components.SpriteRenderer;
 import org.lwjgl.BufferUtils;
 
@@ -29,7 +30,7 @@ public class RenderBatch {
     private int vaoID, vboID, eboID;
 
     public RenderBatch(int maxBatchSize){
-        this.shader = new Shader("assets/shaders/default.glsl");
+        this.shader = ShaderPool.DEFAULT_SHADER;
         this.MAX_BATCH_SIZE = maxBatchSize;
 
         this.VERTICES_SQUARE_SIZE = SpriteRenderer.PROPERTIES_SIZE * 4;

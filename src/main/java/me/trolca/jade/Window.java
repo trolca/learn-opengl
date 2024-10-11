@@ -1,8 +1,10 @@
 package me.trolca.jade;
 
+import me.trolca.jade.assetspools.ShaderPool;
 import me.trolca.jade.scenes.Scene;
 import me.trolca.jade.scenes.SceneType;
 import me.trolca.renderer.Renderer;
+import me.trolca.utils.Pools;
 import me.trolca.utils.Time;
 import org.lwjgl.Version;
 import org.lwjgl.glfw.*;
@@ -51,6 +53,10 @@ public class Window {
         System.out.println("HELLO LWJGL " + Version.getVersion());
 
         init();
+
+        Pools.register();
+        ShaderPool.register();
+
         loop();
 
         //Free the memory

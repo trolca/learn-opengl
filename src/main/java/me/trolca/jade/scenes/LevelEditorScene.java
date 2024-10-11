@@ -3,6 +3,7 @@ package me.trolca.jade.scenes;
 import me.trolca.jade.Camera;
 import me.trolca.jade.GameObject;
 import me.trolca.jade.KeyListener;
+import me.trolca.jade.assetspools.ShaderPool;
 import me.trolca.jade.components.SpriteRenderer;
 import me.trolca.renderer.Shader;
 import me.trolca.renderer.Texture;
@@ -34,17 +35,18 @@ public class LevelEditorScene extends Scene {
         0, 1, 3
     };
 
-    private Shader shader;
     private Texture testTexture;
     private boolean isFirst = false;
+
+    private Shader shader;
 
     private GameObject testObj;
 
     private int vaoID, vboID, eboID;
 
     public LevelEditorScene(){
-        this.shader = new Shader("assets\\shaders\\default.glsl");
         System.out.println("Inside level editor scene");
+        this.shader = ShaderPool.DEFAULT_SHADER;
     }
 
     @Override
