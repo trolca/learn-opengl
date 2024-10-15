@@ -3,6 +3,7 @@ package me.trolca.renderer;
 import me.trolca.jade.Window;
 import me.trolca.jade.assetspools.ShaderPool;
 import me.trolca.jade.components.SpriteRenderer;
+import me.trolca.utils.Utils;
 import org.lwjgl.BufferUtils;
 
 import java.nio.FloatBuffer;
@@ -18,11 +19,13 @@ import static org.lwjgl.opengl.GL30.glGenVertexArrays;
 
 public class RenderBatch {
 
+    private final int TEXTURES_BUFFER_SIZE;
     private final int VERTICES_SQUARE_SIZE;
     private final int MAX_BATCH_SIZE;
     private final float[] verticesArray;
     private final int[] elementArray;
     private final SpriteRenderer[] spriteRenderers;
+    private final Texture[] activeTextures;
     private int nextFree;
     private boolean isFree;
 
@@ -32,6 +35,8 @@ public class RenderBatch {
     public RenderBatch(int maxBatchSize){
         this.shader = ShaderPool.DEFAULT_SHADER;
         this.MAX_BATCH_SIZE = maxBatchSize;
+        this.TEXTURES_BUFFER_SIZE = glGetInteger(GL_MAX_TEXTURE_IMAGE_UNITS);
+        this.activeTextures = new Texture[this.TEXTURES_BUFFER_SIZE];
 
         this.VERTICES_SQUARE_SIZE = SpriteRenderer.PROPERTIES_SIZE * 4;
         this.verticesArray = new float[this.VERTICES_SQUARE_SIZE * MAX_BATCH_SIZE];
@@ -95,10 +100,12 @@ public class RenderBatch {
     public void addSpriteRenderer(SpriteRenderer spriteRenderer){
         if(!isFree) return;
         spriteRenderers[nextFree] = spriteRenderer;
+        Texture texture = spriteRenderer.getTexture();
+        if(texture != null && !Utils.contains(activeTextures, texture)){
+            Utils.addNextFree(activeTextures, texture);
+        }
         float[] verticesToAdd = spriteRenderer.getVertices();
         System.arraycopy(verticesToAdd, 0, verticesArray, nextFree * VERTICES_SQUARE_SIZE, verticesToAdd.length);
-
-        if(nextFree > 9950) System.out.println(Arrays.toString(verticesArray));
 
         nextFree++;
         if(nextFree >= MAX_BATCH_SIZE) isFree = false;

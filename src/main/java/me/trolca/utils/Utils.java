@@ -23,6 +23,33 @@ public class Utils {
         System.arraycopy(itemsToAdd, 0, array, from, itemsToAdd.length);
     }
 
+    public static <T> boolean contains(T[] array, T value){
+
+        for(T arrValue : array){
+
+            if(value.equals(arrValue))
+                return true;
+
+        }
+
+        return false;
+    }
+
+    public static <T> boolean addNextFree(T[] array, T value){
+
+        for(int i=0; i < array.length; i++){
+
+            if(array[i] == null){
+                array[i] = value;
+                return true;
+            }
+
+        }
+
+        return false;
+
+    }
+
     public static String getTextFromInputStream(InputStream in) throws IOException {
 
         StringBuilder stringBuilder = new StringBuilder();

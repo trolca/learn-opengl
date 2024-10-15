@@ -3,7 +3,9 @@ package me.trolca.jade.components;
 import me.trolca.jade.Component;
 import me.trolca.jade.Transform;
 import me.trolca.renderer.Texture;
+import org.jetbrains.annotations.Nullable;
 import org.joml.Vector2f;
+import org.w3c.dom.Text;
 
 import java.awt.*;
 import java.util.Arrays;
@@ -146,5 +148,10 @@ public class SpriteRenderer extends Component {
             vertices[1 + iter] = yPos;
         }
 
+    }
+
+    @Nullable
+    public Texture getTexture(){
+        return texture;
     }
 }
