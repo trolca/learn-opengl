@@ -151,6 +151,12 @@ public class Shader {
         glUniform1i(varLocation, slot);
     }
 
+    public void uploadTextureArray(String varName, int[] slots){
+        int varLocation = glGetUniformLocation(shaderProgram, varName);
+        use();
+        glUniform1iv(varLocation, slots);
+    }
+
     /**
      * Sets the current render process to this shader.
      */
