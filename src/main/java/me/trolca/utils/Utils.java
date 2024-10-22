@@ -23,16 +23,25 @@ public class Utils {
         System.arraycopy(itemsToAdd, 0, array, from, itemsToAdd.length);
     }
 
-    public static <T> boolean contains(T[] array, T value){
+    /**
+     * Gets the index of a specified item in the array
+     * @param array The array to check
+     * @param value The item to get the position of.
+     * @return The index of the item in the array or -1 if not found
+     */
+    public static <T> int getIndexOf(T[] array, T value){
 
-        for(T arrValue : array){
+        for(int i=0 ; i < array.length; i++){
 
-            if(value.equals(arrValue))
-                return true;
-
+            if(array[i] != null && array[i].equals(value))
+                return i;
         }
 
-        return false;
+        return -1;
+    }
+
+    public static <T> boolean contains(T[] array, T value){
+        return getIndexOf(array, value) != -1;
     }
 
     public static <T> boolean addNextFree(T[] array, T value){

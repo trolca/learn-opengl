@@ -13,7 +13,6 @@ public class ShaderPool {
         return shader;
     }
 
-
     public static void register(){
         System.out.println("Registered all of the asset pools!");
     }

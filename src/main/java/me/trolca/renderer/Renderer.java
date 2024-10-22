@@ -8,7 +8,7 @@ import java.util.List;
 
 public class Renderer {
 
-    private static final int MAX_BATCHES_AMOUNT = 10000;
+    private static final int MAX_BATCHES_AMOUNT = 1000;
     private List<RenderBatch> batchesList;
 
     public Renderer(){
@@ -18,7 +18,6 @@ public class Renderer {
 
     public void addGameObject(GameObject go){
         SpriteRenderer spriteRenderer = go.getComponent(SpriteRenderer.class);
-        if(batchesList.size() >= MAX_BATCHES_AMOUNT) return;
 
         if(spriteRenderer != null){
             for(RenderBatch renderBatch : batchesList){

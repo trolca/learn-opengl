@@ -1,6 +1,7 @@
 package me.trolca.jade;
 
 import me.trolca.jade.assetspools.ShaderPool;
+import me.trolca.jade.assetspools.TexturePool;
 import me.trolca.jade.scenes.Scene;
 import me.trolca.jade.scenes.SceneType;
 import me.trolca.renderer.Renderer;
@@ -56,6 +57,7 @@ public class Window {
 
         Pools.register();
         ShaderPool.register();
+        TexturePool.register();
 
         loop();
 
@@ -127,7 +129,6 @@ public class Window {
 
             glClearColor(r, g, b, a);
             glClear(GL_COLOR_BUFFER_BIT);
-
 
 
             if(dt >= 0) {

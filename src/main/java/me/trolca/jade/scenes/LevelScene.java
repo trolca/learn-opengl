@@ -2,6 +2,7 @@ package me.trolca.jade.scenes;
 
 import me.trolca.jade.*;
 import me.trolca.jade.Window;
+import me.trolca.jade.assetspools.TexturePool;
 import me.trolca.jade.components.SpriteRenderer;
 import me.trolca.renderer.Renderer;
 import me.trolca.utils.ShaderUtils;
@@ -13,28 +14,19 @@ import java.io.IOException;
 
 public class LevelScene extends Scene{
 
-    private String[] shaders;
 
     public LevelScene(){
-        try {
-            this.shaders = ShaderUtils.getShaders("default.glsl");
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
 
     }
 
     @Override
     public void init() {
         this.addGameObjectToScene(new GameObject("Super testes", new Transform(new Vector2f(100f, 100f), new Vector2f(100.0f, 100.0f)))
-                .addComponent(new SpriteRenderer(Color.BLACK)));
+                .addComponent(new SpriteRenderer(TexturePool.MARIO_TEXTURE)));
 
-//        for(int i=0; i < 10_000; i++){
-//            GameObject go = new GameObject("Render test " + i, new Transform(i+30, i+30, 27.0f, 27.0f))
-//                    .addComponent(new SpriteRenderer(Color.BLACK));
-//
-//            this.addGameObjectToScene(go);
-//        }
+        this.addGameObjectToScene(new GameObject("Trolca?!", new Transform(200f, 200f, 100f, 100f))
+                .addComponent(new SpriteRenderer(TexturePool.TROLCA_TEXTURE)));
+
 
         this.camera = new Camera(new Vector2f(0.0f,0.0f));
         this.renderer = new Renderer();

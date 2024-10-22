@@ -3,14 +3,14 @@
 layout (location=0) in vec2 aPos;
 layout (location=1) in vec4 aColor;
 layout (location=2) in vec2 aTexCoords;
-layout (location=3) in int aTexIndex;
+layout (location=3) in float aTexIndex;
 
 uniform mat4 uProjection;
 uniform mat4 uView;
 
 out vec4 fColor;
 out vec2 fTexCoords;
-out int texIndex;
+out float texIndex;
 
 void main()
 {
@@ -24,16 +24,16 @@ void main()
 //#type fragment
 #version 330 core
 
-uniform float uTime;
 uniform sampler2D TEX_SAMPLER[16];
 
 in vec4 fColor;
 in vec2 fTexCoords;
-in int texIndex;
+in float texIndex;
 
 out vec4 color;
 
 void main()
 {
-    color = texture(TEX_SAMPLER[texIndex], fTexCoords);
+    int id = int(texIndex);
+    color = texture(TEX_SAMPLER[id], fTexCoords);
 }

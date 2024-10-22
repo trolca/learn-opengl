@@ -41,15 +41,25 @@ public class Texture {
         //yourself!
         ByteBuffer image = stbi_load(filepath, width, height, channels, 0);
 
-        //if(image == null) throw new IOException("Couldn't ")
+
+        glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+        glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
+        glPixelStorei(GL_UNPACK_SKIP_PIXELS, 0);
+        glPixelStorei(GL_UNPACK_SKIP_ROWS, 0);
 
         if(image != null){
-            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width.get(0), height.get(0), 0,
-                    GL_RGBA, GL_UNSIGNED_BYTE, image);
+
+            if(channels.get(0) == 3){
+                glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width.get(0), height.get(0), 0,
+                        GL_RGB, GL_UNSIGNED_BYTE, image);
+            }else if(channels.get(0) == 4) {
+
+                glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width.get(0), height.get(0), 0,
+                        GL_RGBA, GL_UNSIGNED_BYTE, image);
+            }
 
         }else {
-            assert false : "Error: (Texture) Could not load image '" + filepath + "'";
-            //Make it throw exceptions in the future but for now idc
+            throw new RuntimeException("Couldn't create texture for " + filepath);
         }
 
         stbi_image_free(image);
